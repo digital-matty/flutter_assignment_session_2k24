@@ -4,6 +4,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import '../home/home.dart';
 import '../login/account_login.dart';
 import '../signup/signup.dart';
+import '../utils/cache_manager.dart';
 
 void main() {
 runApp(const MyApp());
@@ -80,6 +81,8 @@ class _MyHomePageState extends State<Welcome> {
                   ),
                  FilledButton(
                   onPressed: (){
+                    CacheManager.clearbykey("loginflag");
+            
                     Navigator.push(context, MaterialPageRoute(builder: ((context) => const MyHomePage(title: 'Home',))));
                    },
               child: const Text(

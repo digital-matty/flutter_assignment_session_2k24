@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'utils/cache_manager.dart';
 import 'welcome/welcome.dart';
 
-void main() {
+Future<void> main() async {
    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+   await CacheManager.init();
   runApp(const MyApp());
 }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../account/account.dart';
+import '../popup/popup.dart';
+import '../utils/cache_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,8 +52,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
+    if(CacheManager.getInt("loginflag")==0){
+       dialogBuilder(context,"Alter!!!!","Please login to add item","Ok",false,"cancle");
+    }
+
+
     setState(() {
-      _counter++;
+     
     });
   }
 
@@ -89,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'No item',
             ),
             Text(
               '$_counter',

@@ -3,6 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../login/account_login.dart';
+import '../utils/cache_manager.dart';
 class UserInfo extends StatefulWidget {
   const UserInfo({super.key});
 
@@ -10,6 +11,17 @@ class UserInfo extends StatefulWidget {
   AccountScreen  createState() => AccountScreen();
 }
 class AccountScreen extends State<UserInfo> {
+  bool islogin = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    if(CacheManager.getInt("loginflag")==1){
+      setState(() {
+         islogin = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +32,17 @@ class AccountScreen extends State<UserInfo> {
       body: SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: islogin?
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            
+ 
             const Text('About Me'),
             const SizedBox(height: 10),
-            _buildProfileData('Your Name', 'John Doe'),
-            _buildProfileData('Contact Number', '123-456-7890'),
-            _buildProfileData('Email', 'john.doe@example.com'),
+            _buildProfileData('Your Name', CacheManager.getString("name")),
+            _buildProfileData('Contact Number', CacheManager.getString("number")),
+            _buildProfileData('Email', CacheManager.getString("email")),
             _buildProfileData('Start Date', '2024-01-01'),
             _buildProfileData('Submission Date', '2024-12-31'),
              const SizedBox(height: 20),
@@ -38,8 +53,16 @@ class AccountScreen extends State<UserInfo> {
             const SizedBox(height: 20),
             _buildLogoutButton(context),
           ],
+        )
+        : Column(
+          children: [
+            const Center(
+           child:  Text('Hii Guest User'),
         ),
-      ),
+          _buildLogoutButton(context),
+          ]
+        
+      ),)
     ),);
   }
 

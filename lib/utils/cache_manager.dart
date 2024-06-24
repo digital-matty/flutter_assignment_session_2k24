@@ -1,6 +1,7 @@
+import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 
 
@@ -13,6 +14,7 @@ mixin CacheManager {
   static init() async {
     prefs = await SharedPreferences.getInstance();
   }
+
 
 
   static String getString(String key) {
@@ -39,6 +41,18 @@ mixin CacheManager {
   }
 
 
+
+  
+
+ 
+
+  
+
+  
+
+  
+
+  
 
 
  

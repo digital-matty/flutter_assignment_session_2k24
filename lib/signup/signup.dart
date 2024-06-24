@@ -1,6 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
+import '../home/home.dart';
+import '../utils/cache_manager.dart';
+
 class Signup extends StatefulWidget {
   const Signup({super.key});
 
@@ -32,7 +35,18 @@ class Mysignup extends State<Signup> {
     final isValid = _formKey.currentState?.validate();
     if (!isValid!) {
       return;
+    }else{
+      
+      CacheManager.setString("name",usernameController.text.toString());
+      CacheManager.setString("number",userphoneController.text.toString());
+      CacheManager.setString("email",useremailController.text.toString());
+      CacheManager.setString("email",useremailController.text.toString());
+      CacheManager.setString("password",userpassController.text.toString());
+      CacheManager.setInt("loginflag", 1);
+      Navigator.push(context, MaterialPageRoute(builder: ((context) => const MyHomePage(title: 'Home',))));
+      
     }
+   
     _formKey.currentState?.save();
   }
 
