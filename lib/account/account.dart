@@ -3,8 +3,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../login/account_login.dart';
-
-
 class UserInfo extends StatefulWidget {
   const UserInfo({super.key});
 
