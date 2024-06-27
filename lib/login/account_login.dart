@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:provider/provider.dart';
 
+import '../home/home.dart';
+import '../popup/popup.dart';
+import '../provider/auth_provider.dart';
 import '../signup/signup.dart';
 
 class Login extends StatefulWidget {
@@ -24,10 +28,18 @@ class _MyHomePageState extends State<Login> {
   final TextEditingController _controller = TextEditingController();
 
   // when login button press
-  void submit() {
+  void submit() async {
     final isValid = _formKey.currentState?.validate();
     if (!isValid!) {
       return;
+    }else{
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final success = await authProvider.login(userController.text.toString(), pwdController.text.toString());
+                  if (success) {
+                    Navigator.push(context, MaterialPageRoute(builder: ((context) => const MyHomePage(title: 'Home',))));
+                  } else {
+                    dialogBuilder(context,"Alter!!!!","Login faild","Ok",false,"cancle");
+                  }
     }
   }
 

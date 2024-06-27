@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../db/dbhelper.dart';
 import '../login/account_login.dart';
+import '../provider/auth_provider.dart';
 import '../utils/cache_manager.dart';
+import '../utils/common_webview.dart';
 class UserInfo extends StatefulWidget {
   const UserInfo({super.key});
 
@@ -25,6 +29,8 @@ class AccountScreen extends State<UserInfo> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final username = authProvider.username;
     return Scaffold(
       appBar: AppBar(
         title: Text('My Account'),
@@ -36,19 +42,50 @@ class AccountScreen extends State<UserInfo> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            FutureBuilder<Map<String, dynamic>?>(
+        future: DatabaseHelper.instance.getUser(username!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('No user data found'));
+          } else {
+            final user = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   const Text('About Me'),
+                   const SizedBox(height: 10),
+                   _buildProfileData('Your Name', '${user['username']}'),
+                   _buildProfileData('Contact Number', '${user['contactNumber']}'),
+                   _buildProfileData('Email', '${user['email']}'),
+                   _buildProfileData('Start Date', '2024-01-01'),
+                   _buildProfileData('Submission Date', '2024-12-31'),
+                ],
+              ),
+            );
+          }
+        },
+      ),
+    
             
  
-            const Text('About Me'),
-            const SizedBox(height: 10),
-            _buildProfileData('Your Name', CacheManager.getString("name")),
-            _buildProfileData('Contact Number', CacheManager.getString("number")),
-            _buildProfileData('Email', CacheManager.getString("email")),
-            _buildProfileData('Start Date', '2024-01-01'),
-            _buildProfileData('Submission Date', '2024-12-31'),
+            
+           
+            
+            
+            
+            
              const SizedBox(height: 20),
             _buildChangePasswordSection(),
              const SizedBox(height: 20),
             _buildChangePass(context),
+            const SizedBox(height: 20),
+            _buildaboutUs(context),
           
             const SizedBox(height: 20),
             _buildLogoutButton(context),
@@ -108,13 +145,26 @@ class AccountScreen extends State<UserInfo> {
     return Center(
     child: ElevatedButton(
       onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Login()),
-        );
+        Provider.of<AuthProvider>(context, listen: false).logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const Login()),
+                (route) => false,
+              );
+        
       },
       child: const Text('Logout'),
     ),);
+  }
+   Widget _buildaboutUs(BuildContext context) {
+     return ElevatedButton(
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: ((context) => 
+                       MyWebView(url: 'https://www.digitalmatty.com/')
+                        )));
+       
+      },
+      child: const Text('Contact Us'),
+    );;
   }
 }
 

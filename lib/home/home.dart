@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../account/account.dart';
+import '../db/dbhelper.dart';
+import '../model/item.dart';
 import '../popup/popup.dart';
+import '../provider/theme_provider.dart';
 import '../utils/cache_manager.dart';
+import 'additem.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,15 +56,32 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  void add() {
+  
     if(CacheManager.getInt("loginflag")==0){
        dialogBuilder(context,"Alter!!!!","Please login to add item","Ok",false,"cancle");
+    }else{
+       Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddItemScreen()),
+          ).then((_) {
+            setState(() {
+              _items = DatabaseHelper().getItems();
+            });
+          });
     }
 
 
     setState(() {
      
     });
+  }
+   late Future<List<Item>> _items;
+
+  @override
+  void initState() {
+    super.initState();
+    _items = DatabaseHelper().getItems();
   }
 
   @override
@@ -69,6 +91,24 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
+           Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Consumer<ThemeProvider>(builder: (context, theme, _) {
+              var currentTheme = theme.currentTheme;
+
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: IconButton(
+                  onPressed: () {
+                    currentTheme == "light" ? theme.changeTheme("dark") : theme.changeTheme("light");
+                  },
+                  icon: Icon(currentTheme == "light" ? Icons.dark_mode : Icons.light_mode),
+                  splashRadius: 26,
+                  key: ValueKey(currentTheme),
+                ),
+              );
+            }),
+          ),
           PopupMenuButton<int>(
                           itemBuilder: (context) => [
                                 const PopupMenuItem(
@@ -88,28 +128,48 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                        
                           ),
+                           
                 
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'No item',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
+      body:(CacheManager.getInt("loginflag")==1)?
+      
+       FutureBuilder<List<Item>>(
+        future: _items,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No items found'));
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final item = snapshot.data![index];
+                return ListTile(
+                  leading: Text(item.name),
+                  title: Text(item.name),
+                  subtitle: Text(item.description),
+                  trailing: Text('Rating: ${item.rating}'),
+                );
+              },
+            );
+          }
+        },
+      )
+      :const Column(
+          children: [
+            Center(
+           child:  Text('Hii Guest User'),
+        )]),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), 
+        onPressed: () {
+         add();
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

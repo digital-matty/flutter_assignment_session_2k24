@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:provider/provider.dart';
+import 'provider/auth_provider.dart';
+import 'provider/theme_provider.dart';
+import 'provider/user_list_provider.dart';
 import 'utils/cache_manager.dart';
 import 'welcome/welcome.dart';
 
@@ -16,14 +20,30 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return  MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserListProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()..initialize()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, theme, _) => MaterialApp(
+          title: 'User Registration',
+          theme: ThemeData(
+            brightness: Brightness.light,
+            primaryColor: Colors.blueGrey,
+            fontFamily: 'Poppins',
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: Colors.blueGrey,
+            fontFamily: 'Poppins',
+          ),
+          themeMode: theme.themeMode,
+          debugShowCheckedModeBanner: false,
+          home: const Welcome(),
+        ),
       ),
-      home:  const Welcome(),
     );
   }
 }

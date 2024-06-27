@@ -1,7 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../home/home.dart';
+import '../popup/popup.dart';
+import '../provider/auth_provider.dart';
 import '../utils/cache_manager.dart';
 
 class Signup extends StatefulWidget {
@@ -31,7 +34,7 @@ class Mysignup extends State<Signup> {
   final _formKey = GlobalKey<FormState>();
   var confirmPass;
 
-  void _submit() {
+  void _submit() async {
     final isValid = _formKey.currentState?.validate();
     if (!isValid!) {
       return;
@@ -43,7 +46,25 @@ class Mysignup extends State<Signup> {
       CacheManager.setString("email",useremailController.text.toString());
       CacheManager.setString("password",userpassController.text.toString());
       CacheManager.setInt("loginflag", 1);
-      Navigator.push(context, MaterialPageRoute(builder: ((context) => const MyHomePage(title: 'Home',))));
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final success = await authProvider.register(
+        usernameController.text.toString(), 
+        userpassController.text.toString(),
+        userphoneController.text.toString(),
+        useremailController.text.toString(),
+        "",
+        ""
+
+        
+        );
+      if (success) {
+                 Navigator.push(context, MaterialPageRoute(builder: ((context) => const MyHomePage(title: 'Home',))));
+                } else {
+                  dialogBuilder(context,"Alter!!!!","Registeration Faild","Ok",false,"cancle");
+                }
+
+
+      
       
     }
    
